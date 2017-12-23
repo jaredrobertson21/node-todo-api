@@ -27,3 +27,4 @@ app.listen(tempPort, () => {
     console.log(`Started on ${tempPort}`)
 });
 
+module.exports = {app}
