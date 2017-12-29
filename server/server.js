@@ -6,7 +6,7 @@ const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 
-const tempPort = 3000;
+const port = process.env.PORT || 3000;
 
 var app = express();
 
@@ -56,8 +56,8 @@ app.get('/todos/:id', (req, res) => {
 
 });
 
-app.listen(tempPort, () => {
-    console.log(`Started on ${tempPort}`)
+app.listen(port, () => {
+    console.log(`Started on ${port}`)
 });
 
 module.exports = {app}
