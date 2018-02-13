@@ -215,7 +215,7 @@ describe('POST /users', () => {
                     expect(user).toExist();
                     expect(user.password).toNotBe(password);
                     done();
-                });
+                }).catch((e) => done(e));
             });
     });
 
@@ -247,25 +247,48 @@ describe('POST /users/login', () => {
         request(app)
             .post('/users/login')
             .send({
-                email: users[0].email,
-                password: users[0].password
+                email: users[1].email,
+                password: users[1].password
             })
             .expect(200)
             .expect((res) => {
-                expect(res.body._id).toEqual(users[0]._id);
-                expect(res.body.email).toEqual(users[0].email);
+                expect(res.header['x-auth']).toExist();
             })
-            .end(done);
-    });
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+
+                User.findById(users[1]._id).then((user) => {
+                    expect(user.tokens[0]).toInclude({
+                        access: 'auth',
+                        token: res.headers['x-auth']
+                    });
+                    done();
+                }).catch((e) => done(e));
+            });
+        });            
 
     it('should return 400 for an unsuccessful login', (done) => {
         request(app)
             .post('/users/login')
             .send({
-                email: users[0].email,
+                email: users[1].email,
                 password: "blahblahblah123"
             })
             .expect(400)
-            .end(done);
+            .expect((res) => {
+                expect(res.header['x-auth']).toNotExist();
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+
+                User.findById(users[1]._id).then((user) => {
+                    expect(user.tokens.length).toEqual(0);
+                    done();
+                }).catch((e) => done(e));
+            });
     });
 })
