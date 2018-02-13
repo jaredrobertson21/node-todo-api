@@ -41,7 +41,7 @@ app.get('/todos', authenticate, (req, res) => {
 
 // GET /todos/1234756
 // :id is a 'url parameter'
-app.get('/todos/:id', (req, res) => {
+app.get('/todos/:id', authenticate, (req, res) => {
     // access the :id passed in with req.params.id
     var id = req.params.id;
 
@@ -51,7 +51,10 @@ app.get('/todos/:id', (req, res) => {
     }
 
     // findById
-    Todo.findById(id).then((todo) => {
+    Todo.findOne({
+        _id: id,
+        _creator: req.user._id
+    }).then((todo) => {
         if (todo) {
             return res.status(200).send({todo});
         }
