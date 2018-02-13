@@ -241,3 +241,31 @@ describe('POST /users', () => {
             .end(done);
     });
 })
+
+describe('POST /users/login', () => {
+    it('should return 200 and user data if a user successfully logs in', (done) => {
+        request(app)
+            .post('/users/login')
+            .send({
+                email: users[0].email,
+                password: users[0].password
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body._id).toEqual(users[0]._id);
+                expect(res.body.email).toEqual(users[0].email);
+            })
+            .end(done);
+    });
+
+    it('should return 400 for an unsuccessful login', (done) => {
+        request(app)
+            .post('/users/login')
+            .send({
+                email: users[0].email,
+                password: "blahblahblah123"
+            })
+            .expect(400)
+            .end(done);
+    });
+})
